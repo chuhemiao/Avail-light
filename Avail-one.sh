@@ -40,6 +40,6 @@ sudo systemctl enable availd
 
 systemctl start availd.service
 
-echo '====================================== SETUP FINISHED ========================================='
-echo -e "\e[1;32m Check status: \e[0m\e[1;36m${CYAN} systemctl status availd.service ${NC}\e[0m"
-echo -e "\e[1;32m Check logs  : \e[0m\e[1;36m${CYAN} journalctl -f -u availd ${NC}\e[0m"
+echo '====================================== 安装结束 ========================================='
+echo -e "\e[1;32m 状态检查: \e[0m\e[1;36m${CYAN} systemctl status availd.service ${NC}\e[0m"
+echo -e "\e[1;32m 日志检查  : \e[0m\e[1;36m${CYAN} journalctl -f -u availd ${NC}\e[0m"
