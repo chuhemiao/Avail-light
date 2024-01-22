@@ -1,63 +1,57 @@
 #!/bin/bash
 
-# 命令：检查命令是否存在，如果需要则安装
-安装_如果_缺失() {
-  if ! command -v "$1" &>/dev/null; then
-    sudo apt update && sudo apt install "$1" -y < "/dev/null"
-  fi
+# 函数：检查命令是否存在
+exists() {
+  command -v "$1" >/dev/null 2>&1
 }
 
-# 命令：下载并解压二进制文件
-下载_二进制文件() {
-  BIN_DIR="${HOME}/avail-light"
-  mkdir -p "${BIN_DIR}"
-  cd "${BIN_DIR}"
-
-  wget "https://github.com/availproject/avail-light/releases/download/v1.7.5-rc8/avail-light-linux-amd64.tar.gz"
-  tar -xvzf avail-light-linux-amd64.tar.gz
-  cp avail-light-linux-amd64 avail-light
+# 函数：安装依赖项（如果不存在）
+install_dependency() {
+  exists "$1" || sudo apt update && sudo apt install "$1" -y < "/dev/null"
 }
 
-# 命令：创建并启用 systemd 服务
-设置_systemd服务() {
-  SERVICE_FILE="/etc/systemd/system/availd.service"
-  tee "${SERVICE_FILE}" > /dev/null << EOF
+# 安装必要的依赖项
+install_dependency curl
+install_dependency make
+install_dependency clang
+install_dependency pkg-config
+install_dependency libssl-dev
+install_dependency build-essential
+
+# 设置安装目录和发布 URL
+INSTALL_DIR="${HOME}/avail-light"
+RELEASE_URL="https://github.com/availproject/avail-light/releases/download/v1.7.5-rc8/avail-light-linux-amd64.tar.gz"
+
+# 创建安装目录并进入
+mkdir -p "$INSTALL_DIR"
+cd "$INSTALL_DIR" || exit
+
+# 下载并解压发布包
+wget "$RELEASE_URL"
+tar -xvzf avail-light-linux-amd64.tar.gz
+cp avail-light-linux-amd64 avail-light
+
+# 配置 systemd 服务文件
+tee /etc/systemd/system/availd.service > /dev/null << EOF
 [Unit]
-Description=Avail Light 客户端
+Description=Avail Light Client
 After=network.target
 StartLimitIntervalSec=0
-
-[Service]
-User=root
-ExecStart=${BIN_DIR}/avail-light --network goldberg
-Restart=always
+[Service] 
+User=root 
+ExecStart=/root/avail-light/avail-light --network goldberg
+Restart=always 
 RestartSec=120
-
-[Install]
+[Install] 
 WantedBy=multi-user.target
 EOF
 
-  sudo systemctl daemon-reload
-  sudo systemctl enable availd
-  sudo systemctl start availd.service
-}
+# 重新加载 systemd 并启用并启动服务
+sudo systemctl daemon-reload
+sudo systemctl enable availd
+sudo systemctl start availd.service
 
-# 主脚本
-
-# 如果不存在，安装 curl
-安装_如果_缺失 curl
-
-# 升级并安装必要的软件包
-sudo apt update
-sudo apt install make clang pkg-config libssl-dev build-essential -y
-
-# 下载并运行二进制文件
-下载_二进制文件
-
-# 创建并启用 systemd 服务
-设置_systemd服务
-
-# 完成消息
-echo '====================================== 安装完成 ========================================='
+# 完成安装提示
+echo '====================================== SETUP FINISHED ========================================='
 echo -e "\e[1;32m 检查状态: \e[0m\e[1;36m${CYAN} systemctl status availd.service ${NC}\e[0m"
 echo -e "\e[1;32m 检查日志  : \e[0m\e[1;36m${CYAN} journalctl -f -u availd ${NC}\e[0m"
