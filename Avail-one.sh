@@ -13,8 +13,7 @@
   mkdir -p "${BIN_DIR}"
   cd "${BIN_DIR}"
 
-  RELEASE_URL="https://github.com/availproject/avail-light/releases/download/v1.7.5-rc8/avail-light-linux-amd64.tar.gz"
-  wget "${RELEASE_URL}/avail-light-linux-amd64.tar.gz"
+  wget "https://github.com/availproject/avail-light/releases/download/v1.7.5-rc8/avail-light-linux-amd64.tar.gz"
   tar -xvzf avail-light-linux-amd64.tar.gz
   cp avail-light-linux-amd64 avail-light
 }
