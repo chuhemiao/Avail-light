@@ -31,18 +31,24 @@ wget "$RELEASE_URL"
 tar -xvzf avail-light-linux-amd64.tar.gz
 cp avail-light-linux-amd64 avail-light
 
+# 创建identity.toml文件
+read -p "请输入您的12位钱包助记词：" SECRET_SEED_PHRASE
+cat > identity.toml <<EOF
+avail_secret_seed_phrase = "$SECRET_SEED_PHRASE"
+EOF
+
 # 配置 systemd 服务文件
 tee /etc/systemd/system/availd.service > /dev/null << EOF
 [Unit]
 Description=Avail Light Client
 After=network.target
 StartLimitIntervalSec=0
-[Service] 
-User=root 
-ExecStart=/root/avail-light/avail-light --network goldberg
-Restart=always 
+[Service]
+User=root
+ExecStart=/root/avail-light/avail-light --network goldberg --identity /root/avail-light/identity.toml
+Restart=always
 RestartSec=120
-[Install] 
+[Install]
 WantedBy=multi-user.target
 EOF
 
@@ -52,6 +58,6 @@ sudo systemctl enable availd
 sudo systemctl start availd.service
 
 # 完成安装提示
-echo '====================================== SETUP FINISHED ========================================='
+echo '====================================== 安装完成 ========================================='
 echo -e "\e[1;32m 检查状态: \e[0m\e[1;36m${CYAN} systemctl status availd.service ${NC}\e[0m"
 echo -e "\e[1;32m 检查日志  : \e[0m\e[1;36m${CYAN} journalctl -f -u availd ${NC}\e[0m"
