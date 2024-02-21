@@ -61,3 +61,4 @@ sudo systemctl start availd.service
 echo '====================================== 安装完成 ========================================='
 echo -e "\e[1;32m 检查状态: \e[0m\e[1;36m${CYAN} systemctl status availd.service ${NC}\e[0m"
 echo -e "\e[1;32m 检查日志  : \e[0m\e[1;36m${CYAN} journalctl -f -u availd ${NC}\e[0m"
+echo -e "\e[1;32m 检查Avail运行钱包地址  : \e[0m\e[1;36m${CYAN} journalctl -u availd | grep address ${NC}\e[0m"
